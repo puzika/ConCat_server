@@ -9,12 +9,12 @@ import {
   Delete,
   ParseIntPipe
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { UserCreateDto } from './dto/user.create.dto';
+import { UserService } from './users.service';
+import { UserCreateDto } from './dto/users.create.dto';
 import { UserUpdateDto } from './dto/user.update.dto';
 import { ZodValidationPipe } from 'nestjs-zod';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor (private readonly userService: UserService) {}
 

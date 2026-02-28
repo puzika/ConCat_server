@@ -1,5 +1,5 @@
 import { createZodDto } from "nestjs-zod";
-import { userCreateSchema } from "./user.create.dto";
+import { userCreateSchema } from "./users.create.dto";
 
 const userUpdateSchema = userCreateSchema.partial();
 
