@@ -3,7 +3,7 @@ CREATE TYPE "MessageType" AS ENUM ('text', 'audio', 'video');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" BIGSERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -13,29 +13,29 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "Refresh_token" (
-    "id" BIGSERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "token" TEXT NOT NULL,
-    "user_id" BIGINT NOT NULL,
+    "user_id" INTEGER NOT NULL,
 
     CONSTRAINT "Refresh_token_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Chat" (
-    "id" BIGSERIAL NOT NULL,
-    "participant_one_id" BIGINT NOT NULL,
-    "participant_two_id" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "participant_one_id" INTEGER NOT NULL,
+    "participant_two_id" INTEGER NOT NULL,
 
     CONSTRAINT "Chat_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Message" (
-    "id" BIGSERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "type" "MessageType" NOT NULL,
     "content" TEXT NOT NULL DEFAULT '',
-    "chat_id" BIGINT NOT NULL,
-    "sender_id" BIGINT NOT NULL,
+    "chat_id" INTEGER NOT NULL,
+    "sender_id" INTEGER NOT NULL,
 
     CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
 );

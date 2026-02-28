@@ -5,8 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
@@ -14,7 +15,7 @@ datasource db {
 }
 
 model User {
-  id                   BigInt         @id @default(autoincrement())
+  id                   Int            @id @default(autoincrement())
   username             String
   email                String         @unique
   password             String
@@ -25,31 +26,31 @@ model User {
 }
 
 model Refresh_token {
-  id      BigInt @id @default(autoincrement())
+  id      Int    @id @default(autoincrement())
   token   String @unique
   user    User   @relation(fields: [user_id], references: [id])
-  user_id BigInt @unique
+  user_id Int    @unique
 }
 
 model Chat {
-  id                 BigInt    @id @default(autoincrement())
+  id                 Int       @id @default(autoincrement())
   messages           Message[]
   participant_one    User      @relation("participant one", fields: [participant_one_id], references: [id])
   participant_two    User      @relation("participant two", fields: [participant_two_id], references: [id])
-  participant_one_id BigInt
-  participant_two_id BigInt
+  participant_one_id Int
+  participant_two_id Int
 
   @@unique([participant_one_id, participant_two_id])
 }
 
 model Message {
-  id        BigInt      @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   type      MessageType
   content   String      @default("")
   chat      Chat        @relation(fields: [chat_id], references: [id])
-  chat_id   BigInt
+  chat_id   Int
   sender    User        @relation(fields: [sender_id], references: [id])
-  sender_id BigInt
+  sender_id Int
 }
 
 enum MessageType {
