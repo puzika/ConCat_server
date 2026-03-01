@@ -24,8 +24,14 @@ export class UserController {
   }
 
   @Get()
-  async findMany(@Query('search') query: string) {
-    return await this.userService.findMany(query);
+  async findMany(
+    @Query('search') query: string,
+    @Query('connectedTo', new ParseIntPipe({ optional: true })) userId: number
+  ) {
+    if (query) return await this.userService.findManySearch(query);
+    if (userId) return await this.userService.findManyParticipants(userId);
+
+    return [];
   }
 
   @Patch(':id')
@@ -35,6 +41,6 @@ export class UserController {
 
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.delete(id);
+    return await this.userService.delete(id);
   }
 }

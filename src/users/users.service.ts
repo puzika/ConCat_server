@@ -13,7 +13,7 @@ export class UserService {
     })
   }
 
-  async findMany(query: string) {
+  async findManySearch(query: string) {
     return await this.databaseService.user.findMany({
       where: {
         OR: [
@@ -22,6 +22,21 @@ export class UserService {
         ]
       }
     });
+  }
+
+  async findManyParticipants(userId: number) {
+    return await this.databaseService.$queryRaw`
+      SELECT
+        u.id,
+        u.username
+      FROM
+        "User" AS u
+      INNER JOIN
+        "Chat" AS c
+      ON
+        (c.participant_one_id = ${userId} OR c.participant_two_id = ${userId}) AND (u.id <> ${userId})
+      ;
+    `;
   }
 
   async update(id: number, updates: UserUpdateDto) {

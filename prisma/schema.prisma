@@ -23,6 +23,8 @@ model User {
   participant_one_chat Chat[]         @relation("participant one")
   participant_two_chat Chat[]         @relation("participant two")
   sent_messages        Message[]
+
+  @@index([username])
 }
 
 model Refresh_token {
@@ -44,13 +46,17 @@ model Chat {
 }
 
 model Message {
-  id        Int         @id @default(autoincrement())
-  type      MessageType
-  content   String      @default("")
-  chat      Chat        @relation(fields: [chat_id], references: [id])
-  chat_id   Int
-  sender    User        @relation(fields: [sender_id], references: [id])
-  sender_id Int
+  id          Int         @id @default(autoincrement())
+  type        MessageType
+  content     String      @default("")
+  chat        Chat        @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+  chat_id     Int
+  sender      User        @relation(fields: [sender_id], references: [id])
+  sender_id   Int
+  created_at  DateTime    @default(now())
+  modified_at DateTime    @updatedAt
+
+  @@index([chat_id])
 }
 
 enum MessageType {

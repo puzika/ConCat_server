@@ -7,4 +7,3 @@ const chatsCreateSchema = z.object({
 });
 
 export class ChatsCreateDto extends createZodDto(chatsCreateSchema) {};
-

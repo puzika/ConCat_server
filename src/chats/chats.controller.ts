@@ -21,11 +21,6 @@ export class ChatsController {
     return await this.chatsService.create(chatData);
   }
 
-  @Get()
-  async findMany(@Query('userId', ParseIntPipe) userId: number) {
-    return await this.chatsService.findMany(userId);
-  }
-
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {
     return await this.chatsService.delete(id);
