@@ -24,14 +24,15 @@ export class UserController {
   }
 
   @Get()
-  async findMany(
-    @Query('search') query: string,
-    @Query('connectedTo', new ParseIntPipe({ optional: true })) userId: number
-  ) {
+  async findMany(@Query('search') query: string) {
     if (query) return await this.userService.findManySearch(query);
-    if (userId) return await this.userService.findManyParticipants(userId);
 
     return [];
+  }
+
+  @Get(':id')
+  async findOne(@Param('id', new ParseIntPipe) userId: number) {
+    return await this.userService.findManyParticipants(userId);
   }
 
   @Patch(':id')

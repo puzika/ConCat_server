@@ -27,15 +27,17 @@ export class UserService {
   async findManyParticipants(userId: number) {
     return await this.databaseService.$queryRaw`
       SELECT
-        u.id,
-        u.username
+        u.id AS "userId",
+        u.username AS "username",
+        c.id AS "chatId"
       FROM
         "User" AS u
       INNER JOIN
         "Chat" AS c
-      ON
-        (c.participant_one_id = ${userId} OR c.participant_two_id = ${userId}) AND (u.id <> ${userId})
-      ;
+      ON(
+        (c.participant_one_id = u.id AND c.participant_two_id = ${userId}) OR
+        (c.participant_one_id = ${userId} AND c.participant_two_id = u.id)
+      );
     `;
   }
 
