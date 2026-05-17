@@ -47,6 +47,7 @@ model Chat {
 
 model Message {
   id          Int         @id @default(autoincrement())
+  client_id   String?     @unique
   type        MessageType
   content     String      @default("")
   chat        Chat        @relation(fields: [chat_id], references: [id], onDelete: Cascade)

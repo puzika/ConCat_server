@@ -8,7 +8,7 @@ import {
   ConnectedSocket
 } from '@nestjs/websockets';
 import { ZodValidationPipe } from 'nestjs-zod';
-import { NewMessageDto } from './dto/socket.newmsg.dto';
+import { MessageDto } from 'src/shared/dto/messages.dto';
 import type { Socket, Server } from 'socket.io';
 
 @WebSocketGateway({ cors: { origin: "*" }})
@@ -24,9 +24,8 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
     console.log("User ", client.id, "disconnected");
   }
 
-  @SubscribeMessage('new message')
-  handleMessage(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
-    
+  handleSendMessage(@MessageBody(ZodValidationPipe) message: MessageDto) {
+    this.server.emit('message:received', message);
   }
 
   @SubscribeMessage('join chat')

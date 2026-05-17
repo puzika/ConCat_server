@@ -30,11 +30,6 @@ export class UserController {
     return [];
   }
 
-  @Get(':id')
-  async findOne(@Param('id', new ParseIntPipe) userId: number) {
-    return await this.userService.findManyParticipants(userId);
-  }
-
   @Patch(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Body(ZodValidationPipe) updates: UserUpdateDto) {
     return await this.userService.update(id, updates);

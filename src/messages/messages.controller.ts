@@ -9,7 +9,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { ZodValidationPipe } from 'nestjs-zod';
-import { MessageCreateDto } from './dto/messages.create.dto';
+import { MessageDto } from 'src/shared/dto/messages.dto';
 import { MessageUpdateDto } from './dto/messages.update.dto';
 import { MessagesService } from './messages.service';
 
@@ -18,7 +18,7 @@ export class MessagesController {
   constructor (private readonly messagesService: MessagesService) {}
 
   @Post()
-  async create(@Body(ZodValidationPipe) message: MessageCreateDto) {
+  async create(@Body(ZodValidationPipe) message: MessageDto) {
     return await this.messagesService.create(message);
   }
 

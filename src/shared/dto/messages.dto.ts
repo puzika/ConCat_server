@@ -4,6 +4,7 @@ import { createZodDto } from "nestjs-zod";
 export const messageCreateSchema = z.object({
   type: z.enum(["text", "audio", "video"], "Invalid message type"),
   content: z.string().default(""),
+  client_id: z.string().nullable().optional(),
   chat_id: z.number("Invalid chat id"),
   sender_id: z.number("Invalid sender id")
 }).refine(data => (data.type !== "text") || (data.content.length > 0), {
@@ -11,4 +12,4 @@ export const messageCreateSchema = z.object({
   path: ["content"]
 });
 
-export class MessageCreateDto extends createZodDto(messageCreateSchema) {};
+export class MessageDto extends createZodDto(messageCreateSchema) {};
