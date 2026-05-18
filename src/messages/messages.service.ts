@@ -15,10 +15,10 @@ export class MessagesService {
     const createdMessage = await this.databaseService.message.create({
       data: message,
     });
+    
+    this.socketService.handleSendMessage(createdMessage);
 
-    if (createdMessage) {
-      this.socketService.handleSendMessage(createdMessage);
-    }
+    return createdMessage;
   }
 
   async findMany(chatId: number) {
@@ -38,10 +38,14 @@ export class MessagesService {
   }
 
   async delete(messageId: number) {
-    return await this.databaseService.message.delete({
+    const deletedMessage = await this.databaseService.message.delete({
       where: {
         id: messageId,
       }
     });
+
+    this.socketService.handleDeleteMessage(deletedMessage.id);
+
+    return deletedMessage;
   }
 }

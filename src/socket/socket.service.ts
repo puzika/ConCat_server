@@ -8,6 +8,7 @@ import {
   ConnectedSocket
 } from '@nestjs/websockets';
 import { ZodValidationPipe } from 'nestjs-zod';
+import { ParseIntPipe } from '@nestjs/common';
 import { MessageDto } from 'src/shared/dto/messages.dto';
 import type { Socket, Server } from 'socket.io';
 
@@ -26,6 +27,10 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleSendMessage(@MessageBody(ZodValidationPipe) message: MessageDto) {
     this.server.emit('message:received', message);
+  }
+
+  handleDeleteMessage(@MessageBody(ParseIntPipe) messageId: number) {
+    this.server.emit('message:deleted', messageId);
   }
 
   @SubscribeMessage('join chat')
