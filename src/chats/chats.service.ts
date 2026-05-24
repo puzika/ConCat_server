@@ -19,7 +19,7 @@ export class ChatsService {
   }
 
   async findChat(chatId: number) {
-    return await this.databaseService.chat.findFirst({
+    const chat = await this.databaseService.chat.findFirst({
       where: { id: chatId },
       select: {
         id: true,
@@ -38,10 +38,24 @@ export class ChatsService {
         messages: {
           orderBy: {
             created_at: 'desc',
+          },
+          include: {
+            parent_message: {
+              include: {
+                sender: {
+                  select: {
+                    id: true,
+                    username: true,
+                  }
+                }
+              }
+            }
           }
         },
       },
     });
+
+    return chat;
   }
 
   async findDuplicateChat(userOneId: number, userTwoId: number) {

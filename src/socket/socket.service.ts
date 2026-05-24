@@ -29,6 +29,10 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('message:received', message);
   }
 
+  handleUpdateMessage(@MessageBody(ZodValidationPipe) message: MessageDto) {
+    this.server.emit('message:updated', message);
+  }
+
   handleDeleteMessage(@MessageBody(ParseIntPipe) messageId: number) {
     this.server.emit('message:deleted', messageId);
   }

@@ -6,7 +6,8 @@ export const messageCreateSchema = z.object({
   content: z.string().default(""),
   client_id: z.string().nullable().optional(),
   chat_id: z.number("Invalid chat id"),
-  sender_id: z.number("Invalid sender id")
+  sender_id: z.number("Invalid sender id"),
+  parent_message_id: z.number().nullable().optional(),
 }).refine(data => (data.type !== "text") || (data.content.length > 0), {
   error: "Text messages must be at least one character long",
   path: ["content"]

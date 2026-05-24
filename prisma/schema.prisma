@@ -46,16 +46,19 @@ model Chat {
 }
 
 model Message {
-  id          Int         @id @default(autoincrement())
-  client_id   String?     @unique
-  type        MessageType
-  content     String      @default("")
-  chat        Chat        @relation(fields: [chat_id], references: [id], onDelete: Cascade)
-  chat_id     Int
-  sender      User        @relation(fields: [sender_id], references: [id])
-  sender_id   Int
-  created_at  DateTime    @default(now())
-  modified_at DateTime    @updatedAt
+  id                Int         @id @default(autoincrement())
+  client_id         String?     @unique
+  type              MessageType
+  content           String      @default("")
+  chat              Chat        @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+  chat_id           Int
+  sender            User        @relation(fields: [sender_id], references: [id])
+  sender_id         Int
+  created_at        DateTime    @default(now())
+  modified_at       DateTime    @updatedAt
+  parent_message_id Int?
+  parent_message    Message?    @relation("MessageReplies", fields: [parent_message_id], references: [id])
+  reply             Message[]   @relation("MessageReplies")
 
   @@index([chat_id])
 }

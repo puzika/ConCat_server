@@ -14,6 +14,18 @@ export class MessagesService {
   async create(message: MessageDto) {
     const createdMessage = await this.databaseService.message.create({
       data: message,
+      include: {
+        parent_message: {
+          include: {
+            sender: {
+              select: {
+                id: true,
+                username: true,
+              }
+            }
+          }
+        },
+      }
     });
     
     this.socketService.handleSendMessage(createdMessage);
@@ -28,13 +40,29 @@ export class MessagesService {
   }
 
   async update(messageId: number, changes: MessageUpdateDto) {
-    return await this.databaseService.message.update({
+    const updatedMessage = await this.databaseService.message.update({
       where: {
         id: messageId,
         type: "text",
       },
-      data: changes
-    })
+      data: changes,
+      include: {
+        parent_message: {
+          include: {
+            sender: {
+              select: {
+                id: true,
+                username: true,
+              }
+            }
+          }
+        },
+      }
+    });
+
+    this.socketService.handleUpdateMessage(updatedMessage);
+
+    return updatedMessage;
   }
 
   async delete(messageId: number) {
