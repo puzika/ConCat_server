@@ -17,12 +17,7 @@ import { ZodValidationPipe } from 'nestjs-zod';
 @Controller('users')
 export class UserController {
   constructor (private readonly userService: UserService) {}
-
-  @Post()
-  async create(@Body(ZodValidationPipe) user: UserCreateDto) {
-    return await this.userService.create(user);
-  }
-
+  
   @Get()
   async findMany(@Query('search') query: string) {
     if (query) return await this.userService.findManySearch(query);

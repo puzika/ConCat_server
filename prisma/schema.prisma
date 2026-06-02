@@ -15,23 +15,25 @@ datasource db {
 }
 
 model User {
-  id                   Int            @id @default(autoincrement())
+  id                   Int             @id @default(autoincrement())
   username             String
-  email                String         @unique
+  email                String          @unique
   password             String
-  refresh              Refresh_token?
-  participant_one_chat Chat[]         @relation("participant one")
-  participant_two_chat Chat[]         @relation("participant two")
+  refresh              Refresh_token[]
+  participant_one_chat Chat[]          @relation("participant one")
+  participant_two_chat Chat[]          @relation("participant two")
   sent_messages        Message[]
 
   @@index([username])
 }
 
 model Refresh_token {
-  id      Int    @id @default(autoincrement())
-  token   String @unique
-  user    User   @relation(fields: [user_id], references: [id])
-  user_id Int    @unique
+  id         String   @id
+  token      String   @unique
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    Int
+  is_used    Boolean  @default(false)
+  created_at DateTime @default(now())
 }
 
 model Chat {
