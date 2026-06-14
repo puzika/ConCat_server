@@ -1,10 +1,11 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { UnauthorizedException, Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { SignupDto, SigninDto } from './dto';
 import { JwtPayload, Tokens } from './types';
 import { JwtService } from '@nestjs/jwt';
 import * as crypto from 'crypto';
 import * as argon from 'argon2';
+import { Refresh_token } from 'generated/prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +14,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signup(signupDto: SignupDto): Promise<Tokens> {
+  async signup(signupDto: SignupDto, rt: string | undefined) {
     const { password } = signupDto;
     const hashedPassword = await argon.hash(password);
 
@@ -24,29 +25,61 @@ export class AuthService {
       },
     });
 
+    let refreshToken: Refresh_token | null = null;
+
+    if (rt) {
+      const decoded = this.jwtService.decode(rt) as JwtPayload;
+
+      if (decoded && decoded.jti) {
+        refreshToken = await this.databaseService.refresh_token.findUnique({
+          where: { id: decoded.jti },
+        });
+      }
+
+      if (refreshToken) {
+        await this.markRefreshUsed(refreshToken.id);
+      }
+    }
+
     const tokenId = crypto.randomUUID();
     const tokens = await this.generateTokens(user.id, tokenId);
     await this.createRefreshHash(user.id, tokens.refreshToken, tokenId);
 
-    return tokens;
+    return { tokens, user};
   }
 
-  async signin(signinDto: SigninDto): Promise<Tokens> {
+  async signin(signinDto: SigninDto, rt: string | undefined) {
     const { password, email } = signinDto;
     const user = await this.databaseService.user.findUnique({ where: { email } });
 
-    if (!user) throw new ForbiddenException('Access unauthorized');
+    if (!user) throw new UnauthorizedException('Email or password is wrong');
 
     const { password: hashedPassword, id} = user;
     const passwordsMatch = await argon.verify(hashedPassword, password);
 
-    if (!passwordsMatch) throw new ForbiddenException('Access unauthorized');
+    if (!passwordsMatch) throw new UnauthorizedException('Email or password is wrong');
+
+    let refreshToken: Refresh_token | null = null;
+
+    if (rt) {
+      const decoded = this.jwtService.decode(rt) as JwtPayload;
+
+      if (decoded && decoded.jti) {
+        refreshToken = await this.databaseService.refresh_token.findUnique({
+          where: { id: decoded.jti },
+        });
+      }
+
+      if (refreshToken) {
+        await this.markRefreshUsed(refreshToken.id);
+      }
+    }
 
     const tokenId = crypto.randomUUID();
     const tokens = await this.generateTokens(id, tokenId);
     await this.createRefreshHash(id, tokens.refreshToken, tokenId);
 
-    return tokens;
+    return { tokens, user };
   }
 
   async logout(userId: number) {
@@ -60,22 +93,22 @@ export class AuthService {
   async refresh(userId: number, rt: string) {
     const decoded = this.jwtService.decode(rt) as JwtPayload;
 
-    if (!decoded || !decoded.jti) throw new ForbiddenException('Access unauthorized');
+    if (!decoded || !decoded.jti) throw new UnauthorizedException('ACCESS_UNAUTHORIZED');
 
     const refreshToken = await this.databaseService.refresh_token.findUnique({
       where: { id: decoded.jti },
     });
 
-    if (!refreshToken) throw new ForbiddenException('Access unauthorized');
-
-    const tokensMatch = await argon.verify(refreshToken.token, rt);
-
-    if (!tokensMatch) throw new ForbiddenException('Access unauthorized');
+    if (!refreshToken) throw new UnauthorizedException('ACCESS_UNAUTHORIZED');
 
     if (refreshToken.is_used) {
       await this.logout(userId);
-      throw new ForbiddenException('Access unauthorized');
+      throw new UnauthorizedException('TOKEN_COMPROMISED');
     }
+
+    const tokensMatch = await argon.verify(refreshToken.token, rt);
+
+    if (!tokensMatch) throw new UnauthorizedException('ACCESS_UNAUTHORIZED');
 
     await this.markRefreshUsed(refreshToken.id);
 

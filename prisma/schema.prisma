@@ -30,7 +30,7 @@ model User {
 model Refresh_token {
   id         String   @id
   token      String   @unique
-  user       User     @relation(fields: [user_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id    Int
   is_used    Boolean  @default(false)
   created_at DateTime @default(now())

@@ -13,6 +13,10 @@ export class UserService {
     })
   }
 
+  async findUnique(userId: number) {
+    return await this.databaseService.user.findUnique({ where: { id: userId }});
+  }
+
   async findManySearch(query: string) {
     return await this.databaseService.user.findMany({
       where: {

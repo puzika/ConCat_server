@@ -1,24 +1,28 @@
 import { 
   Controller,
-  Post,
   Get,
   Patch,
   Body,
   Query,
   Param,
   Delete,
-  ParseIntPipe
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UserService } from './users.service';
-import { UserCreateDto } from './dto/users.create.dto';
 import { UserUpdateDto } from './dto/user.update.dto';
 import { ZodValidationPipe } from 'nestjs-zod';
+import { GetCurrentUser, Public } from 'src/common/decorators';
 
 @Controller('users')
 export class UserController {
   constructor (private readonly userService: UserService) {}
-  
-  @Get()
+
+  @Get('me') 
+  async findUnique(@GetCurrentUser('sub') userId: number) {
+    return await this.userService.findUnique(userId);
+  }
+
+  @Get('find')
   async findMany(@Query('search') query: string) {
     if (query) return await this.userService.findManySearch(query);
 
