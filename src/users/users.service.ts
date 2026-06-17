@@ -17,14 +17,15 @@ export class UserService {
     return await this.databaseService.user.findUnique({ where: { id: userId }});
   }
 
-  async findManySearch(query: string) {
+  async findManySearch(query: string, userId: number) {
     return await this.databaseService.user.findMany({
       where: {
-        OR: [
-          { email: { contains: query, mode: 'insensitive' }, },
-          { username: { contains: query, mode: 'insensitive' }, }
-        ]
-      }
+        username: { contains: query, mode: 'insensitive' },
+        NOT: {
+          id: userId,
+        }
+      },
+      omit: { password: true },
     });
   }
 

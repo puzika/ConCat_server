@@ -24,16 +24,10 @@ export class ChatsService {
       select: {
         id: true,
         participant_one: {
-          select: {
-            id: true,
-            username: true,
-          },
+          omit: { password: true },
         },
         participant_two: {
-          select: {
-            id: true,
-            username: true,
-          },
+          omit: { password: true },
         },
         messages: {
           orderBy: {
@@ -43,10 +37,7 @@ export class ChatsService {
             parent_message: {
               include: {
                 sender: {
-                  select: {
-                    id: true,
-                    username: true,
-                  }
+                  omit: { password: true },
                 }
               }
             }
@@ -80,16 +71,10 @@ export class ChatsService {
       select: {
         id: true,
         participant_one: {
-          select: {
-            id: true,
-            username: true,
-          },
+          omit: { password: true },
         },
         participant_two: {
-          select: {
-            id: true,
-            username: true,
-          }
+          omit: { password: true },
         }
       }
     });

@@ -47,7 +47,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
     @Body(ZodValidationPipe) signupDto: SignupDto
   ) {
-    const refreshToken = request.cookies?.['Refresh'] ?? undefined;
+    const refreshToken = request.cookies?.['Refresh'];
     const { tokens, user } = await this.authService.signup(signupDto, refreshToken);
     const { password, ...userData } = user;
 
@@ -64,7 +64,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
     @Body(ZodValidationPipe) signinDto: SigninDto
   ) {
-    const refreshToken = request.cookies?.['Refresh'] ?? undefined;
+    const refreshToken = request.cookies?.['Refresh'];
     const { tokens, user } = await this.authService.signin(signinDto, refreshToken);
     const { password, ...userData} = user;
 

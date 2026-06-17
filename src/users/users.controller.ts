@@ -11,7 +11,7 @@ import {
 import { UserService } from './users.service';
 import { UserUpdateDto } from './dto/user.update.dto';
 import { ZodValidationPipe } from 'nestjs-zod';
-import { GetCurrentUser, Public } from 'src/common/decorators';
+import { GetCurrentUser } from 'src/common/decorators';
 
 @Controller('users')
 export class UserController {
@@ -23,8 +23,11 @@ export class UserController {
   }
 
   @Get('find')
-  async findMany(@Query('search') query: string) {
-    if (query) return await this.userService.findManySearch(query);
+  async findMany(
+    @GetCurrentUser('sub') userId: number,
+    @Query('search') query: string,
+  ) {
+    if (query) return await this.userService.findManySearch(query, userId);
 
     return [];
   }
