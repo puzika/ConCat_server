@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { ChatsCreateDto } from './dto/chats.create.dto';
-
+import { ChatsDto } from 'src/shared/dto/chats.create.dto';
 @Injectable()
 export class ChatsService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async create(chatData: ChatsCreateDto) {
+  async create(chatData: ChatsDto) {
     const { participant_one_id, participant_two_id } = chatData;
 
     const duplicate = await this.findDuplicateChat(participant_one_id, participant_two_id);

@@ -13,6 +13,7 @@ import { MessageDto } from 'src/shared/dto/messages.dto';
 import { JwtService } from '@nestjs/jwt';
 import { DatabaseService } from 'src/database/database.service';
 import { type JwtPayload } from 'src/auth/types';
+import { type ChatsDto } from 'src/shared/dto/chats.create.dto';
 import type { Socket, Server } from 'socket.io';
 import * as cookie from 'cookie';
 import z from 'zod';
@@ -63,13 +64,13 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
     client.data.userId = sub;
 
     if (!this.onlineUsers.has(sub)) {
-      this.onlineUsers.set(sub, new Set());
-      this.server.emit(`status:updated:${sub}`, { isOnline: true });
-
-      await this.databaseService.user.update({
+      const updatedUser = await this.databaseService.user.update({
         where: { id: sub },
         data: { is_online: true },
       });
+
+      this.onlineUsers.set(sub, new Set());
+      this.server.emit(`status:updated:${sub}`, { isOnline: true, lastSeen: updatedUser.last_seen });
     }
 
     const socketConnections = this.onlineUsers.get(sub);
@@ -87,13 +88,13 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
     socketConnections.delete(client.id);
 
     if (socketConnections.size === 0) {
-      this.onlineUsers.delete(sub);
-      this.server.emit(`status:updated:${sub}`, { isOnline: false });
-
-      await this.databaseService.user.update({
+      const updatedUser = await this.databaseService.user.update({
         where: { id: sub },
-        data: { is_online: false },
+        data: { is_online: false, last_seen: new Date() },
       });
+
+      this.onlineUsers.delete(sub);
+      this.server.emit(`status:updated:${sub}`, { isOnline: false, lastSeen: updatedUser.last_seen });
     }
   }
 
@@ -107,5 +108,11 @@ export class SocketService implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleDeleteMessage(@MessageBody(ParseIntPipe) messageId: number) {
     this.server.emit('message:deleted', messageId);
+  }
+
+  handleCreateChat(@MessageBody(ZodValidationPipe) chat: ChatsDto) {
+    console.log(chat);
+    this.server.emit(`chat:created:${chat.participant_one_id}`);
+    this.server.emit(`chat:created:${chat.participant_two_id}`);
   }
 }

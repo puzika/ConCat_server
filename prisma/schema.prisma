@@ -24,6 +24,7 @@ model User {
   participant_two_chat Chat[]          @relation("participant two")
   sent_messages        Message[]
   is_online            Boolean         @default(false)
+  last_seen            DateTime?
 
   @@index([username])
 }

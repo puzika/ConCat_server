@@ -10,15 +10,21 @@ import {
 } from '@nestjs/common';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { ChatsService } from './chats.service';
-import { ChatsCreateDto } from './dto/chats.create.dto';
+import { SocketService } from 'src/socket/socket.service';
+import { ChatsDto } from 'src/shared/dto/chats.create.dto';
 
 @Controller('chats')
 export class ChatsController {
-  constructor(private readonly chatsService: ChatsService) {}
+  constructor(
+    private readonly chatsService: ChatsService,
+    private readonly socketService: SocketService
+  ) {}
 
   @Post()
-  async create(@Body(ZodValidationPipe) chatData: ChatsCreateDto) {
-    return await this.chatsService.create(chatData);
+  async create(@Body(ZodValidationPipe) chatData: ChatsDto) {
+    const chat = await this.chatsService.create(chatData);
+    this.socketService.handleCreateChat(chat);
+    return chat;
   }
 
   @Get()
